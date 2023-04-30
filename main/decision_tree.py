@@ -4,6 +4,7 @@ from sklearn import tree
 from sklearn import preprocessing
 import graphviz
 from data_utils import *
+from sklearn.metrics import accuracy_score
 
 
 def partition(x):
@@ -210,24 +211,24 @@ def visualize(tree, depth=0):
             print('+-- [LABEL = {0}]'.format(sub_trees))
 
 
-def confusion_matrix_multiclass(y, y_pred, classes, fig):
-    confusion_matrix = np.zeros((len(np.unique(y)), len(np.unique(y))))
-    rows = []
-    columns = []
-    for cl in classes.tolist():
-        rows.append("Actual " + str(cl))
-        columns.append("Predicted " + str(cl))
-    for i, j in zip(y, y_pred):
-        # breakpoint()
-        confusion_matrix[i][j] += 1
-    fig.subplots_adjust(left=0.3, top=0.8, wspace=2)
-    ax = plt.subplot2grid((1, 1), (0, 0), colspan=2, rowspan=2)
-    table = ax.table(cellText=confusion_matrix.tolist(),
-                     rowLabels=rows,
-                     colLabels=columns, loc="upper center")
-    table.set_fontsize(14)
-    table.scale(1, 2)
-    ax.axis("off")
+# def confusion_matrix_multiclass(y, y_pred, classes, fig):
+#     confusion_matrix = np.zeros((len(np.unique(y)), len(np.unique(y))))
+#     rows = []
+#     columns = []
+#     for cl in classes.tolist():
+#         rows.append("Actual " + str(cl))
+#         columns.append("Predicted " + str(cl))
+#     for i, j in zip(y, y_pred):
+#         # breakpoint()
+#         confusion_matrix[i][j] += 1
+#     fig.subplots_adjust(left=0.3, top=0.8, wspace=2)
+#     ax = plt.subplot2grid((1, 1), (0, 0), colspan=2, rowspan=2)
+#     table = ax.table(cellText=confusion_matrix.tolist(),
+#                      rowLabels=rows,
+#                      colLabels=columns, loc="upper center")
+#     table.set_fontsize(14)
+#     table.scale(1, 2)
+#     ax.axis("off")
 
 
 def confusion_matrix(y, y_pred, fig):
@@ -272,5 +273,5 @@ if __name__ == '__main__':
     test_error = compute_error(ytst, y_pred)
 
     print('Test Error = {0:4.2f}%.'.format(test_error*100))
-    from sklearn.metrics import accuracy_score
+    
     print("Accuracy score from scikit: ",accuracy_score(ytst, y_pred))
