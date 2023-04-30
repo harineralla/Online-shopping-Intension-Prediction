@@ -276,15 +276,9 @@ def confusion_matrix(y, y_pred, fig):
 if __name__ == '__main__':
     # BATCH 1:1
     # Load batch-1 
-    Xtrn, ytrn = get_batch_1_1()
+    Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2 etc
     Xtst, ytst = get_test_data()
-    # M = np.genfromtxt('./data/test.data', missing_values=0,
-    #                   skip_header=0, delimiter=',', dtype=int)
-    
-    # ytrn = M[:, 0]
-    # Xtrn = M[:, 1:]
 
-    # print(Xtrn[0], ytrn[0])
     # Learn a decision tree of depth 3
     decision_tree = id3(Xtrn, ytrn, max_depth=3)
     visualize(decision_tree)
