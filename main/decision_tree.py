@@ -76,34 +76,6 @@ def mutual_information(x, y):
 
 def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
     """
-    Implements the classical ID3 algorithm given training data (x), training labels (y) and an array of
-    attribute-value pairs to consider. This is a recursive algorithm that depends on three termination conditions
-        1. If the entire set of labels (y) is pure (all y = only 0 or only 1), then return that label
-        2. If the set of attribute-value pairs is empty (there is nothing to split on), then return the most common
-           value of y (majority label)
-        3. If the max_depth is reached (pre-pruning bias), then return the most common value of y (majority label)
-    Otherwise the algorithm selects the next best attribute-value pair using INFORMATION GAIN as the splitting criterion
-    and partitions the data set based on the values of that attribute before the next recursive call to ID3.
-
-    The tree we learn is a BINARY tree, which means that every node has only two branches. The splitting criterion has
-    to be chosen from among all possible attribute-value pairs. That is, for a probabilitylem with two features/attributes x1
-    (taking values a, b, c) and x2 (taking values d, e), the initial attribute value pair list is a list of all pairs of
-    attributes with their corresponding values:
-    [(x1, a),
-     (x1, b),
-     (x1, c),
-     (x2, d),
-     (x2, e)]
-     If we select (x2, d) as the best attribute-value pair, then the new decision node becomes: [ (x2 == d)? ] and
-     the attribute-value pair (x2, d) is removed from the list of attribute_value_pairs.
-
-    The tree is stored as a nested dictionary, where each entry is of the form
-                    (attribute_index, attribute_value, True/False): subtree
-    * The (attribute_index, attribute_value) determines the splitting criterion of the current node. For example, (4, 2)
-    indicates that we test if (x4 == 2) at the current node.
-    * The subtree itself can be nested dictionary, or a single label (leaf node).
-    * Leaf nodes are (majority) class labels
-
     Returns a decision tree represented as a nested dictionary, for example
     {(4, 1, False):
         {(0, 1, False):
@@ -115,7 +87,6 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
      (4, 1, True): 1}
     """
 
-    # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
     try:
         if attribute_value_pairs is None:
             attribute_value_pairs = []
@@ -124,6 +95,7 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
                 for attr_value in np.unique(all_values):
                     attribute_value_pairs.append((attr_idx, attr_value))
 
+        # print("attr pairs", attribute_value_pairs)
         attribute_value_pairs = np.array(attribute_value_pairs)
 
         unique_vals_y = np.unique(y)
@@ -142,7 +114,7 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
             attr_val_arr = np.array((x[:, attr] == val).astype(int))
             mutual_info = mutual_information(attr_val_arr, y)
             mutual_info_pairs.append(mutual_info)
-
+        
         mutual_info_pairs = np.array(mutual_info_pairs)
         chosen_attr, chosen_val = attribute_value_pairs[np.argmax(mutual_info_pairs)]
 
@@ -156,9 +128,13 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
             y_after_part = y.take(np.array(ele_indices), axis=0)
             decision_tree[(chosen_attr, chosen_val, out_label)] = id3(x_after_part, y_after_part,
                                                                       attribute_value_pairs=attribute_value_pairs, depth=depth+1, max_depth=max_depth)
+        
+        
+        # print("DT   >>>>   ",decision_tree)
 
         return decision_tree
     except Exception as e:
+        print("erorrr hereee ")
         print(e)
         # raise Exception('Function not yet implemented!')
 
@@ -211,6 +187,9 @@ def visualize(tree, depth=0):
     print the raw nested dictionary representation.
     DO NOT MODIFY THIS FUNCTION!
     """
+
+    if tree is None:
+        raise ValueError("The decision tree is empty")
 
     if depth == 0:
         print('TREE')
@@ -277,16 +256,21 @@ if __name__ == '__main__':
     # BATCH 1:1
     # Load batch-1 
     Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2... etc
+
     Xtst, ytst = get_test_data()
+    # print("X Test DATA IN DT",Xtst[0])
+    print(ytst[0:9])
+    # print(Xtst[0])
 
     # Learn a decision tree of depth 3
     decision_tree = id3(Xtrn, ytrn, max_depth=3)
-    visualize(decision_tree)
+    # visualize(decision_tree)
 
     # Compute the test error
     y_pred = [predict_example(x, decision_tree) for x in Xtst]
+    print(y_pred[0:9])
     test_error = compute_error(ytst, y_pred)
 
-    print('Test Error = {0:4.2f}%.'.format(test_error * 100))
+    print('Test Error = {0:4.2f}%.'.format(test_error*100))
     from sklearn.metrics import accuracy_score
-    print(accuracy_score(ytst, y_pred))
+    print("Accuracy score from scikit: ",accuracy_score(ytst, y_pred))
