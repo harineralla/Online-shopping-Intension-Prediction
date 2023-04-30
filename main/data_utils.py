@@ -6,7 +6,7 @@ def get_batch_1_1():
     # Load the training data of batch 1:1
     M = np.genfromtxt('./data/batch-1-1.data', missing_values=0,
                       skip_header=0, delimiter=',', dtype=int)
-    
+
     ytrn = M[:, 0]
     Xtrn = M[:, 1:]
 
@@ -53,7 +53,6 @@ def get_test_data():
     Xtst = M[:, 1:]
 
     return Xtst, ytst
-
 
 
 # def get():
