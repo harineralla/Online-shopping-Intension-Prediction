@@ -276,7 +276,7 @@ def confusion_matrix(y, y_pred, fig):
 if __name__ == '__main__':
     # BATCH 1:1
     # Load batch-1 
-    Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2 etc
+    Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2... etc
     Xtst, ytst = get_test_data()
 
     # Learn a decision tree of depth 3
