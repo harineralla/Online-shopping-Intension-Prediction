@@ -18,21 +18,11 @@ X = data.drop('Revenue', axis=1)
 y = data['Revenue']
 
 # Split the data into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# test_data = pd.concat([X_test, y_test], axis=1)
+train_data = pd.concat([X_train, y_train], axis=1)
+test_data = pd.concat([X_test, y_test], axis=1)
 
-# Save the test data to a CSV file
-# test_data.to_csv("test_data.csv", index=False)
-
-
-# Train a decision tree classifier
-clf = DecisionTreeClassifier(random_state=42)
-clf.fit(X_train, y_train)
-
-# Predict on the test set
-y_pred = clf.predict(X_test)
-
-# Print the classification report
-target_names = ['No Purchase', 'Purchase']
-print(classification_report(y_test, y_pred, target_names=target_names))
+# Save the train and test data to a CSV file
+train_data.to_csv("train_data.csv", index=False)
+test_data.to_csv("test_data.csv", index=False)
