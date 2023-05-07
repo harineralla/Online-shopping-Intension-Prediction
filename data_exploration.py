@@ -22,9 +22,9 @@ data = pd.read_csv('online_shoppers_intention.csv')
 
 
 # Step 2: Explore the Data
-# print(data.info())
-# print(data.describe())
-# print(data['Revenue'].value_counts())
+print(data.info())
+print(data.describe())
+print(data['Revenue'].value_counts())
 
 # Step 3: Check for Missing Values
 # print("Total missing values:", data.isnull().sum())
