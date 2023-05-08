@@ -4,7 +4,10 @@ from sklearn import tree
 from sklearn import preprocessing
 import graphviz
 from data_utils import *
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
+from sklearn.metrics import confusion_matrix
+import graphviz
 
 
 def partition(x):
@@ -211,26 +214,6 @@ def visualize(tree, depth=0):
             print('+-- [LABEL = {0}]'.format(sub_trees))
 
 
-# def confusion_matrix_multiclass(y, y_pred, classes, fig):
-#     confusion_matrix = np.zeros((len(np.unique(y)), len(np.unique(y))))
-#     rows = []
-#     columns = []
-#     for cl in classes.tolist():
-#         rows.append("Actual " + str(cl))
-#         columns.append("Predicted " + str(cl))
-#     for i, j in zip(y, y_pred):
-#         # breakpoint()
-#         confusion_matrix[i][j] += 1
-#     fig.subplots_adjust(left=0.3, top=0.8, wspace=2)
-#     ax = plt.subplot2grid((1, 1), (0, 0), colspan=2, rowspan=2)
-#     table = ax.table(cellText=confusion_matrix.tolist(),
-#                      rowLabels=rows,
-#                      colLabels=columns, loc="upper center")
-#     table.set_fontsize(14)
-#     table.scale(1, 2)
-#     ax.axis("off")
-
-
 def confusion_matrix(y, y_pred, fig):
     confusion_matrix = np.zeros((2, 2))
     rows = ["Actual Positive", "Actual Negative"]
@@ -254,24 +237,90 @@ def confusion_matrix(y, y_pred, fig):
 
 
 if __name__ == '__main__':
+    # PART-1 training the model using four batches 
     # BATCH 1:1
-    # Load batch-1 
+    # Load batch-1:1, batch-1:2, batch-1:3, batch-1:4 
     Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2... etc
 
     Xtst, ytst = get_test_data()
-    # print("X Test DATA IN DT",Xtst[0])
-    print(ytst[0:9])
-    # print(Xtst[0])
 
-    # Learn a decision tree of depth 3
-    decision_tree = id3(Xtrn, ytrn, max_depth=3)
-    # visualize(decision_tree)
+    """
+    Part- A Training model using our model above for each batch
+    """
+    train_errors = []
+    test_errors = []
+    depths = []
+    decision_trees = []
+    final_ypred = 0
+    for depth in range (1,11):
+        decision_tree = id3(Xtrn, ytrn, max_depth=depth)
+        decision_trees.append(decision_tree)
+        YPred_trn = [predict_example(x, decision_tree) for x in Xtrn]
+        YPred_tst = [predict_example(x, decision_tree) for x in Xtst]
+        train_error = compute_error(ytrn, YPred_trn)
+        test_error = compute_error(ytst, YPred_tst)
+        depths.append(depth)
+        train_errors.append(train_error)
+        test_errors.append(test_error)
+        final_ypred = YPred_tst
+        print("For depth=", depth)
+        print('Test Error for batch 1:1 = {0:4.2f}%.'.format(test_error*100))
+        print("Accuracy score for batch 1:1: ",accuracy_score(ytst, YPred_tst))
+        print()
 
-    # Compute the test error
-    y_pred = [predict_example(x, decision_tree) for x in Xtst]
-    print(y_pred[0:9])
-    test_error = compute_error(ytst, y_pred)
 
-    print('Test Error = {0:4.2f}%.'.format(test_error*100))
-    
-    print("Accuracy score from scikit: ",accuracy_score(ytst, y_pred))
+    fig1 = plt.figure(1)
+    confusion_matrix(ytst, final_ypred, fig1)
+    fig1.suptitle("Decision Tree after 10 depths training Confusion Matrix-Batch 1:4")
+
+    splt_idx = 130
+    plt.title("Training and Test errors for Batch 1:1 for depths 10")
+    plt.xlabel("Max Depth")
+    plt.ylabel("Error")
+    plt.grid()
+    plt.plot(depths, train_errors, 'o-', color='r', label='Training Examples')
+    plt.plot(depths, test_errors, 'o-', color='b', label='Testing Examples')
+    plt.legend(loc="best")
+    plt.show()
+
+
+    """
+    Part- B Training model using Scikit Learn and visualizing using graphviz and confusion Matrix
+    """
+    train_errors = []
+    test_errors = []
+    depths = []
+    decision_trees = []
+    scikitDescTree = tree.DecisionTreeClassifier(criterion="entropy")
+    scikitDescTree.fit(Xtrn, ytrn)
+    predictedYScikit = [scikitDescTree.predict(
+        np.array(x).reshape(1, -1))[0] for x in Xtst]
+    print("Accuracy score from scikit for batch 1:1: ",accuracy_score(ytst, predictedYScikit))
+    print("Precision score from scikit for batch 1:1:", precision_score(ytst,predictedYScikit))
+    print("Recall score from scikit for batch 1:1:", recall_score(ytst,predictedYScikit))
+    print("F1 score from scikit for batch 1:1:", f1_score(ytst,predictedYScikit))
+
+
+    fig3 = plt.figure(5)
+    confusion_matrix(ytst, predictedYScikit, fig3)
+    fig3.suptitle(
+        "Confusion Matrix for Batch 1:4 Test Set with Scikit Decision tree")
+    plt.show()
+    splt_idx = 130
+
+    # Generate the graphviz visualization of the decision tree
+    dot_data = export_graphviz(scikitDescTree, out_file=None,
+                            feature_names=['Administrative', 'Administrative_Duration', 'Informational',
+                                          'Informational_Duration', 'ProductRelated', 'ProductRelated_Duration',
+                                          'BounceRates', 'ExitRates', 'PageValues', 'SpecialDay', 'Month',
+                                          'OperatingSystems', 'Browser', 'Region', 'TrafficType', 'VisitorType',
+                                          'Weekend', 'OperatingSystems_1', 'OperatingSystems_2',
+                                          'OperatingSystems_3', 'OperatingSystems_4', 'OperatingSystems_5', 
+                                          'OperatingSystems_6', 'OperatingSystems_7', 'Browser_1', 'Browser_2',
+                                          'Browser_3', 'Browser_4', 'Browser_5'],
+                            filled=True, rounded=True,
+                            special_characters=True)
+    graph = graphviz.Source(dot_data)
+
+    # Display the graphviz visualization of the decision tree
+    graph.view()
