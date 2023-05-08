@@ -1,4 +1,4 @@
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
 from data_utils import *
 import seaborn as sns
 import numpy as np
@@ -28,22 +28,19 @@ def confusion_matrix(y, y_pred, fig):
              colLabels=cols, loc="upper center")
     ax.axis("off")
 
-def process_gradient_boosting(Xtrn, ytrn, Xtst, ytst, batch_count):
-    clf = GradientBoostingClassifier(n_estimators=800,
-                                     learning_rate=0.01,
-                                     max_depth=6,
-                                     random_state=5).fit(Xtrn, ytrn)
+def process_random_forest(Xtrn, ytrn, Xtst, ytst, batch_count):
+    clf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42).fit(Xtrn, ytrn)
     # take predictions on the test data
     predictions = clf.predict(Xtst)
 
     print("Accuracy:", round(accuracy_score(ytst, predictions), 4))
     print("Precision Score:", round(precision_score(ytst, predictions), 4))
-    print("Recall score :", recall_score(ytst,predictions))
+    print("Recall score :", recall_score(ytst, predictions))
     print("F-1 Score:", round(f1_score(ytst, predictions), 4))
-    
+
     fig1 = plt.figure(1)
     confusion_matrix(ytst, predictions, fig1)
-    fig1.suptitle("Decision Tree after 10 depths training Confusion Matrix-Batch {0}".format(batch_count))
+    fig1.suptitle("Random Forest Confusion Matrix - Batch {0}".format(batch_count))
     plt.show()
 
 if __name__ == '__main__':
@@ -52,7 +49,7 @@ if __name__ == '__main__':
     Xtrn3, ytrn3 = get_batch_1_3()
     Xtrn4, ytrn4 = get_batch_1_4()
     Xtst, ytst = get_test_data()
-    process_gradient_boosting(Xtrn1,ytrn1, Xtst,ytst,1)
-    process_gradient_boosting(Xtrn2,ytrn2, Xtst,ytst,2)
-    process_gradient_boosting(Xtrn3,ytrn3, Xtst,ytst,3)
-    process_gradient_boosting(Xtrn4,ytrn4, Xtst,ytst,4)
+    process_random_forest(Xtrn1,ytrn1, Xtst,ytst,1)
+    process_random_forest(Xtrn2,ytrn2, Xtst,ytst,2)
+    process_random_forest(Xtrn3,ytrn3, Xtst,ytst,3)
+    process_random_forest(Xtrn4,ytrn4, Xtst,ytst,4)
