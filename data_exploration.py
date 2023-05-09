@@ -52,40 +52,13 @@ data[num_features] = scaler.fit_transform(data[num_features])
 # data['Revenue'] = data['Revenue'].map({'TRUE': 1, 'FALSE': 0})
 
 # Step 7: Visualize the Data
-# sns.countplot(x='Revenue', data=data)
-# plt.show()
+sns.countplot(x='Revenue', data=data)
+plt.show()
 
-# sns.pairplot(data, hue='Revenue')
-# plt.show()
+sns.pairplot(data, hue='Revenue')
+plt.show()
 
-'''
-# Feature scaling for SVM and Gradient Boosting
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train.select_dtypes(include='number'))
-X_test_scaled = scaler.transform(X_test.select_dtypes(include='number'))
 
-# Recursive Feature Elimination with cross-validation for logistic regression and decision trees
-lr = LogisticRegression(random_state=42)
-dt = DecisionTreeClassifier(random_state=42)
-rfe_lr = RFECV(lr, cv=5)
-rfe_dt = RFECV(dt, cv=5)
-X_train_lr = rfe_lr.fit_transform(X_train, y_train)
-X_test_lr = rfe_lr.transform(X_test)
-X_train_dt = rfe_dt.fit_transform(X_train, y_train)
-X_test_dt = rfe_dt.transform(X_test)
-
-# Recursive Feature Elimination with grid search for SVM and Gradient Boosting
-svc = SVC(random_state=42)
-gb = GradientBoostingClassifier(random_state=42)
-rfe_svc = RFECV(svc, cv=5)
-rfe_gb = RFECV(gb, cv=5)
-X_train_svc = rfe_svc.fit_transform(X_train_scaled, y_train)
-X_test_svc = rfe_svc.transform(X_test_scaled)
-X_train_gb = rfe_gb.fit_transform(X_train_scaled, y_train)
-X_test_gb = rfe_gb.transform(X_test_scaled)
-
-'''
-#OR OR OR OR OR 
 """
 
 # Feature selection: We can use SelectKBest from scikit-learn to select the best features

@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.model_selection import StratifiedKFold
 import graphviz
 from data_utils import *
 from sklearn.metrics import accuracy_score
@@ -9,15 +10,19 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import LinearSVC
 import seaborn as sns
 from sklearn.utils import shuffle
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import precision_score, recall_score
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from scipy.spatial import Voronoi, voronoi_plot_2d
-from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score, f1_score
+from sklearn.model_selection import KFold
+
 
 
 class SupportVectorMachine:
-    def __init__(self, C=10, features=2, width=0.1, kernel="None"):
+    def __init__(self, C=20, features=29, width=0.01, kernel="None"):
         self.C = C
         self.features = features
         self.width = width
@@ -40,7 +45,7 @@ class SupportVectorMachine:
             op.append(row)
         return np.array(op)
     
-    def fit(self, x_train, y_train, epochs=1000, print_interval=100, learning_rate=0.01):
+    def fit(self, x_train, y_train, epochs=20, print_interval=1, learning_rate=0.1):
         y = y_train[:]
         x = x_train[:]
         self.initial = x[:]
@@ -83,11 +88,16 @@ class SupportVectorMachine:
 
     def evaluate(self,x,y):
         y_hat=self.predict(x)
-        y_hat = np.array([0 if i == -1 else 1 for i in y_hat])
-        print("prediction vals", y_hat[:30])
-        diff = np.abs(np.array([0 if i == -1 else 1 for i in y]) - y_hat)
-        corr_pred = len(diff) - sum(diff)
-        return [(corr_pred) / len(diff), y_hat]
+        # y_hat = np.array([0 if i == -1 else 1 for i in y_hat])
+        # print("prediction vals", y_hat[:50])
+        # diff = np.abs(np.array([0 if i == -1 else 1 for i in y]) - y_hat)
+        n = len(y)
+        y_true = np.array([0 if i == -1 else 1 for i in y])
+        y_pred = np.array([0 if i == -1 else 1 for i in y_hat])
+        # print("in eval y_pred",y_pred[:50])
+        return [1-np.sum(y_true^y_pred) / n, y_hat]
+        # corr_pred = len(diff) - sum(diff)
+        # return [(corr_pred) / len(diff), y_hat]
 
     def predict(self,x):
         if(self.kernel=="gaussian"):
@@ -174,7 +184,6 @@ def scatter_plot_3d_features(features, labels):
     fig.colorbar(scatter)
     plt.show()
 
-
 def confusion_matrix(y, y_pred, fig):
     confusion_matrix = np.zeros((2, 2))
     rows = ["Actual Positive", "Actual Negative"]
@@ -201,34 +210,21 @@ if __name__ == '__main__':
     Xtrn, ytrn = get_batch_1_3() # change the batch values fucntion from 1-1 to 1-2... etc
     
     q=Xtrn.shape[1]
-    print("shape before", q)
-    Xtst, ytst = get_test_data()
+    print("cols before feature selection:", q)
+    # Xtst, ytst = get_test_data()
+    Xtst, ytst = get_batch_1_1()
     print("Data preprocessing in progress..")
-    Xtrn, ytrn = shuffle(Xtrn, ytrn, random_state=42)
+    Xtrn, ytrn = shuffle(Xtrn, ytrn, random_state=12)
     # x1tst,y1tst = get_batch_1_3()
 
-
-    from sklearn.feature_selection import SelectKBest, f_classif
-
-    # Assuming X_train and y_train are your training data and labels, respectively
-
-    # Initialize SelectKBest with the desired number of features to select
-    k = 15  # Number of features to select
+    #feature selection
+    k = 12  # Number of features to select
     selector = SelectKBest(score_func=f_classif, k=k)
-
-    # Fit the selector on the training data
     selector.fit(Xtrn, ytrn)
-
-    # Get the indices of the selected features
     selected_feature_indices = selector.get_support(indices=True)
-
-    # Subset the training data with the selected features
     Xtrn = Xtrn[:, selected_feature_indices]
     w=Xtrn.shape[1]
-    print("shape after", w)
-
-
-    # Similarly, subset the test data (if applicable)
+    print("cols after feaure selection:", w)
     Xtst = Xtst[:, selected_feature_indices]
 
 
@@ -238,127 +234,81 @@ if __name__ == '__main__':
     X_test_scaled = scaler.transform(Xtst)
     # x1tstscaled= scaler.transform(x1tst)
     
-    # lr_list = [0.01]
-    # C_list = [20]
-    # epochs_list = [10]
-    # width_list = [0.01]
+    lr_list = [0.1]
+    C_list = [0.01]
+    epochs_list = [5]
+    width_list = [0.01]
 
 
-    # #Model
-    # for lr in lr_list:
-    #     for C in C_list:
-    #         for epochs in epochs_list:
-    #             for width in width_list:
-    #                 model=SupportVectorMachine(C=C,features=X_train_scaled.shape[1],width=width,kernel="gaussian")
-    #                 print("Training the model...")
-    #                 model.fit(X_train_scaled,ytrn,epochs=epochs,print_interval=1,learning_rate=lr)
-    #                 print(f"_________lr={lr}, C={C}, epochs={epochs}, width={width}_____________")
-    #                 train_eval=(model.evaluate(X_train_scaled,ytrn))
-    #                 test_eval = (model.evaluate(X_test_scaled,ytst))
-    #                 print(f"Training Accuracy of our model= {train_eval[0]}")
-    #                 print(f"Testing Accuracy of our model= {test_eval[0]}")
-    #                 # print("Testing new Accuracy = {}".format(model.predict(x1tstscaled,y1tst)))
+    #Model
+    for lr in lr_list:
+        for C in C_list:
+            for epochs in epochs_list:
+                for width in width_list:
+                    model=SupportVectorMachine(C=C,features=X_train_scaled.shape[1],width=width,kernel="gaussian")
+                    print("Training the model...")
+                    model.fit(X_train_scaled,ytrn,epochs=epochs,print_interval=1,learning_rate=lr)
+                    print(f"_________lr={lr}, C={C}, epochs={epochs}, width={width}_____________")
+                    train_eval=(model.evaluate(X_train_scaled,ytrn))
+                    test_eval = (model.evaluate(X_test_scaled,ytst))
+                    print(f"Training Accuracy of our model= {train_eval[0]}")
+                    print(f"Testing Accuracy of our model= {test_eval[0]}")
+                    # print("Testing new Accuracy = {}".format(model.predict(x1tstscaled,y1tst)))
 
-    #                 # Calculate precision score
-    #                 precision = precision_score(ytst, test_eval[1])
+                    # Calculate precision score
+                    precision = precision_score(ytst, test_eval[1], average='macro', zero_division=1)
 
-    #                 # Calculate recall score
-    #                 recall = recall_score(ytst, test_eval[1])
+                    # Calculate recall score
+                    recall = recall_score(ytst, test_eval[1],  average='macro', zero_division=1)
 
-    #                 print("Precision of our model:", precision)
-    #                 print("Recall of our model:", recall)
+                    print("Precision of our model:", precision)
+                    print("Recall of our model:", recall)
 
-    #TSEN
-    # Apply TCEN for dimensionality reduction
-    # ypred = model.predict(X_test_scaled)
-    # tcen = TSNE(n_components=3, random_state=42)
-
-    # from sklearn.decomposition import PCA
-    # pca = PCA(n_components=2)
-
-    # y_test_pred = model.predict(X_train_scaled)
-    # X_test_reduced = pca.fit_transform(model.high_dim_space)
-    # weights_reduced = pca.transform([model.weights])
-    # print("weights:",weights_reduced)
-    # print("reduced x values")
-    # scatter_plot_2d_features(X_test_reduced,y_test_pred)
-    # scatter_plot_3d_features(X_test_reduced,ypred)
+   
 
                     #______________________________________________________________________
                     #plotting decision boundary for the model
-                    # plot_decision_boundary(model,  X_train_scaled,  model.predict(X_train_scaled))
+                    plot_decision_boundary(model,  X_train_scaled,  model.predict(X_train_scaled))
                     #___________________________________________________________________
 
                     #visualize
                      
                     # Plot the loss function
                     
-                    # plt.plot(model.loss_values)
-                    # plt.xlabel('Epoch')
-                    # plt.ylabel('Loss')
-                    # plt.title('Loss Function')
-                    # plt.show()
+                    plt.plot(model.loss_values)
+                    plt.xlabel('Epoch')
+                    plt.ylabel('Loss')
+                    plt.title('Loss Function')
+                    plt.show()
                     #--------------------------------------------------------
 
-                    # # Plotting true and predicted labels
+                    # Plotting true and predicted labels
                     # # Reduce the dimensionality of X_test_scaled using PCA
-                    # pca = PCA(n_components=2)
-                    # X_test_reduced = pca.fit_transform(X_test_scaled)
+                    pca = PCA(n_components=2)
+                    X_test_reduced = pca.fit_transform(X_test_scaled)
 
-                    # # Plotting true and predicted labels after PCA
-                    # plt.figure(figsize=(12, 6))
+                    # Plotting true and predicted labels after PCA
+                    plt.figure(figsize=(12, 6))
 
-                    # # True Labels
-                    # plt.subplot(1, 2, 1)
-                    # plt.scatter(X_test_reduced[:, 0], X_test_reduced[:, 1], c=ytst, cmap=plt.cm.Paired)
-                    # plt.xlabel('Component 1')
-                    # plt.ylabel('Component 2')
-                    # plt.title('True Labels')
+                    # True Labels
+                    plt.subplot(1, 2, 1)
+                    plt.scatter(X_test_reduced[:, 0], X_test_reduced[:, 1], c=ytst, cmap=plt.cm.Paired)
+                    plt.xlabel('Component 1')
+                    plt.ylabel('Component 2')
+                    plt.title('True Labels')
 
-                    # # Predicted Labels
-                    # plt.subplot(1, 2, 2)
-                    # plt.scatter(X_test_reduced[:, 0], X_test_reduced[:, 1], c=model.predict(X_test_scaled), cmap=plt.cm.Paired)
-                    # plt.xlabel('Component 1')
-                    # plt.ylabel('Component 2')
-                    # plt.title('Predicted Labels')
+                    # Predicted Labels
+                    plt.subplot(1, 2, 2)
+                    plt.scatter(X_test_reduced[:, 0], X_test_reduced[:, 1], c=model.predict(X_test_scaled), cmap=plt.cm.Paired)
+                    plt.xlabel('Component 1')
+                    plt.ylabel('Component 2')
+                    plt.title('Predicted Labels')
 
-                    # plt.tight_layout()
-                    # plt.show()
-
-                    # ---------------------------------------------------------
-                    # XXXXXXXXXX
-                    # # Get the dataset using get_batch_1_3()
-                    # X, y = get_batch_1_3()
-
-                    # # Select two features for SVM
-                    # feature1 = 4  # Index of the first feature
-                    # feature2 = 5  # Index of the second feature
-
-                    # # Extract the selected features and the target variable
-                    # selected_features = X[:, [feature1, feature2]]
-
-                    # # Shuffle the data
-                    # X_shuffled, y_shuffled = shuffle(selected_features, y, random_state=42)
-
-                    # # Split the data into training and test sets
-                    # X_train, X_test, y_train, y_test = train_test_split(X_shuffled, y_shuffled, test_size=0.2, random_state=42)
-
-                    # # Feature scaling
-                    # scaler = StandardScaler()
-                    # X_train_scaled = scaler.fit_transform(X_train)
-                    # X_test_scaled = scaler.transform(X_test)
-
-                  
-                    # Z = Z.reshape(xx.shape)
-                    # print("almost..")
-                    # plt.contourf(xx, yy, Z, alpha=0.8)
-                    # sns.scatterplot(x=X_train_scaled[:, 0], y=X_train_scaled[:, 1], hue=y_train, cmap=plt.cm.Paired)
-                    # plt.xlabel(f"Feature {feature1+1}")
-                    # plt.ylabel(f"Feature {feature2+1}")
-                    # plt.title('SVM Decision Boundary')
-                    # plt.show()
+                    plt.tight_layout()
+                    plt.show()
 
 
+#________________________________ SCIKIT SVM MODEL ______________________________________________
 #________________________________ SCIKIT SVM MODEL ______________________________________________
 #   # Train the SVM model
     # for c in [0.1,1,30,50]:
@@ -393,3 +343,98 @@ if __name__ == '__main__':
     plt.title('ROC Curve for SVM Linear')
     plt.legend(loc="lower right")
     plt.show()
+
+    #_____________cross validation-----------------------------------------
+
+    # # Get the data from each batch
+    Xtrn1, ytrn1 = get_batch_1_1()
+    Xtrn2, ytrn2 = get_batch_1_2()
+    Xtrn3, ytrn3 = get_batch_1_3()
+    # Xtrn4, ytrn4 = get_batch_1_4()
+
+    # # Concatenate the data horizontally
+    Xtrn_combined = np.concatenate((Xtrn1, Xtrn2, Xtrn3), axis=0)
+    # # Xtrn_combined = np.concatenate((Xtrn1, Xtrn2), axis=0)
+    # Xtrn_combined = Xtrn1
+
+    ytrn_combined = np.concatenate((ytrn1, ytrn2, ytrn3), axis=0)
+    # # ytrn_combined = np.concatenate((ytrn1, ytrn2), axis=0)
+    # ytrn_combined = ytrn1
+
+    print("Data preprocessing in progress..")
+    Xtrn, ytrn = shuffle(Xtrn_combined, ytrn_combined, random_state=3)
+
+    #feature selection
+    k = 12  # Number of features to select
+    selector = SelectKBest(score_func=f_classif, k=k)
+    selector.fit(Xtrn, ytrn)
+    selected_feature_indices = selector.get_support(indices=True)
+    Xtrn = Xtrn[:, selected_feature_indices]
+    w=Xtrn.shape[1]
+    print("cols after feaure selection:", w)
+
+
+    # Feature scaling for SVM and Gradient Boosting
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(Xtrn)
+
+    
+
+    # # Print the combined data
+    # print("Combined Xtrn shape:", Xtrn_combined.shape)
+    # print("Combined ytrn shape:", ytrn_combined.shape)
+
+    # Assuming X and y are your input features and labels
+    X = X_train_scaled  # Your input features
+    y = ytrn_combined # Your labels
+
+    # X = scaler.fit_transform(X)
+    
+    model = SupportVectorMachine(C=0.1, features=X.shape[1], width=0.01, kernel="gaussian")
+
+    # Perform cross-validation
+    num_folds = 4
+    # kf = StratifiedKFold(n_splits=num_folds, shuffle = True, random_state=42)
+    kf = KFold(n_splits=num_folds)
+
+    accuracy_scores = []
+    precision_scores = []
+    recall_scores = []
+
+    for train_index, val_index in kf.split(X,y):
+        X_train, X_val = X[train_index], X[val_index]
+        y_train, y_val = y[train_index], y[val_index]
+
+        # Fit the model on the training data
+        model.fit(X_train, y_train,epochs=10,print_interval=1,learning_rate=0.01)
+
+        # Predict on the validation data
+        y_pred = model.predict(X_val)
+
+        # Calculate accuracy
+        accuracy = accuracy_score(y_val, y_pred)
+        accuracy_scores.append(accuracy)
+
+        # Calculate precision and recall (assuming binary classification)
+        precision = precision_score(y_val, y_pred, average='weighted', zero_division=0)
+        recall = recall_score(y_val, y_pred, average='weighted', zero_division=0)
+        precision_scores.append(precision)
+        recall_scores.append(recall)
+
+    # Print the scores for each fold
+    for i in range(num_folds):
+        print(f"Fold {i+1} Accuracy: {accuracy_scores[i]}")
+        print(f"Fold {i+1} Precision: {precision_scores[i]}")
+        print(f"Fold {i+1} Recall: {recall_scores[i]}")
+
+    # Calculate the average scores across all folds
+    avg_accuracy = np.mean(accuracy_scores)
+    avg_precision = np.mean(precision_scores)
+    avg_recall = np.mean(recall_scores)
+
+    print(f"Average Accuracy: {avg_accuracy}")
+    print(f"Average Precision: {avg_precision}")
+    print(f"Average Recall: {avg_recall}")
+
+####################### Final ###########################
+#Please comment necessary file for necessary actions

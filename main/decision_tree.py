@@ -249,7 +249,7 @@ def predict_example_proba(x, tree):
 if __name__ == '__main__':
     # PART-1 training the model using four batches 
     # BATCH 1:1
-    # Load batch-1:1, batch-1:2, batch-1:3, batch-1:4 
+    # Load batch-1 
     Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2... etc
     # Xtrn, ytrn = get_batch_1_2()
     # Xtrn, ytrn = get_batch_1_3()
