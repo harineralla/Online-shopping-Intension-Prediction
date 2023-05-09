@@ -9,10 +9,11 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import LinearSVC
 import seaborn as sns
 from sklearn.utils import shuffle
-from sklearn.metrics import precision_score, recall_score
+from sklearn.metrics import precision_score, recall_score, f1_score
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from scipy.spatial import Voronoi, voronoi_plot_2d
+from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
 
 
 class SupportVectorMachine:
@@ -174,8 +175,30 @@ def scatter_plot_3d_features(features, labels):
     plt.show()
 
 
+def confusion_matrix(y, y_pred, fig):
+    confusion_matrix = np.zeros((2, 2))
+    rows = ["Actual Positive", "Actual Negative"]
+    cols = ("Classifier Positive", "Classifier Negative")
+    for i in range(len(y_pred)):
+        if int(y_pred[i]) == 1 and int(y[i]) == 1:
+            confusion_matrix[0, 0] += 1 
+        elif int(y_pred[i]) == 1 and int(y[i]) == 0:
+            confusion_matrix[1, 0] += 1  
+        elif int(y_pred[i]) == 0 and int(y[i]) == 1:
+            confusion_matrix[0, 1] += 1  
+        elif int(y_pred[i]) == 0 and int(y[i]) == 0:
+            confusion_matrix[1, 1] += 1  
+
+    fig.subplots_adjust(left=0.3, top=0.8, wspace=1)
+    ax = plt.subplot2grid((1, 1), (0, 0), colspan=2, rowspan=2)
+    ax.table(cellText=confusion_matrix.tolist(),
+             rowLabels=rows,
+             colLabels=cols, loc="upper center")
+    ax.axis("off")
+
+
 if __name__ == '__main__':
-    Xtrn, ytrn = get_batch_1_4() # change the batch values fucntion from 1-1 to 1-2... etc
+    Xtrn, ytrn = get_batch_1_3() # change the batch values fucntion from 1-1 to 1-2... etc
     
     q=Xtrn.shape[1]
     print("shape before", q)
@@ -215,35 +238,35 @@ if __name__ == '__main__':
     X_test_scaled = scaler.transform(Xtst)
     # x1tstscaled= scaler.transform(x1tst)
     
-    lr_list = [0.01]
-    C_list = [20]
-    epochs_list = [10]
-    width_list = [0.01]
+    # lr_list = [0.01]
+    # C_list = [20]
+    # epochs_list = [10]
+    # width_list = [0.01]
 
 
-    #Model
-    for lr in lr_list:
-        for C in C_list:
-            for epochs in epochs_list:
-                for width in width_list:
-                    model=SupportVectorMachine(C=C,features=X_train_scaled.shape[1],width=width,kernel="gaussian")
-                    print("Training the model...")
-                    model.fit(X_train_scaled,ytrn,epochs=epochs,print_interval=1,learning_rate=lr)
-                    print(f"_________lr={lr}, C={C}, epochs={epochs}, width={width}_____________")
-                    train_eval=(model.evaluate(X_train_scaled,ytrn))
-                    test_eval = (model.evaluate(X_test_scaled,ytst))
-                    print(f"Training Accuracy of our model= {train_eval[0]}")
-                    print(f"Testing Accuracy of our model= {test_eval[0]}")
-                    # print("Testing new Accuracy = {}".format(model.predict(x1tstscaled,y1tst)))
+    # #Model
+    # for lr in lr_list:
+    #     for C in C_list:
+    #         for epochs in epochs_list:
+    #             for width in width_list:
+    #                 model=SupportVectorMachine(C=C,features=X_train_scaled.shape[1],width=width,kernel="gaussian")
+    #                 print("Training the model...")
+    #                 model.fit(X_train_scaled,ytrn,epochs=epochs,print_interval=1,learning_rate=lr)
+    #                 print(f"_________lr={lr}, C={C}, epochs={epochs}, width={width}_____________")
+    #                 train_eval=(model.evaluate(X_train_scaled,ytrn))
+    #                 test_eval = (model.evaluate(X_test_scaled,ytst))
+    #                 print(f"Training Accuracy of our model= {train_eval[0]}")
+    #                 print(f"Testing Accuracy of our model= {test_eval[0]}")
+    #                 # print("Testing new Accuracy = {}".format(model.predict(x1tstscaled,y1tst)))
 
-                    # Calculate precision score
-                    precision = precision_score(ytst, test_eval[1])
+    #                 # Calculate precision score
+    #                 precision = precision_score(ytst, test_eval[1])
 
-                    # Calculate recall score
-                    recall = recall_score(ytst, test_eval[1])
+    #                 # Calculate recall score
+    #                 recall = recall_score(ytst, test_eval[1])
 
-                    print("Precision of our model:", precision)
-                    print("Recall of our model:", recall)
+    #                 print("Precision of our model:", precision)
+    #                 print("Recall of our model:", recall)
 
     #TSEN
     # Apply TCEN for dimensionality reduction
@@ -338,7 +361,8 @@ if __name__ == '__main__':
 
 #________________________________ SCIKIT SVM MODEL ______________________________________________
 #   # Train the SVM model
-    svmSk = LinearSVC(C=10, max_iter=10000)
+    # for c in [0.1,1,30,50]:
+    svmSk = LinearSVC(C=0.1, max_iter=10)
     svmSk.fit(X_train_scaled, ytrn)
 
     # y_train_pred = svmSk.predict(X_train_scaled)
@@ -346,14 +370,26 @@ if __name__ == '__main__':
     y_pred = svmSk.predict(X_test_scaled)
 
     acc = accuracy_score(ytst, y_pred)
-    print("Test Accuracy of SCKIT model for SVM: ", acc)
-    # print("trained pred", accuracy_score(ytrn, y_train_pred))
-
-    # Calculate precision score
     precision = precision_score(ytst, y_pred)
-
-    # Calculate recall score
     recall = recall_score(ytst, y_pred)
+    f1_score = f1_score(ytst,y_pred)
+    print("Accuracy of SCKIT model for SVM-Linear: ", acc)
+    print("Precision of scikit model for SVM-Linear:", precision)
+    print("Recall of scikit model for SVM-Linear:", recall)
+    print("F1 Score of scikit model for SVM-Linear", f1_score)
 
-    print("Precision of scikit model:", precision)
-    print("Recall of scikit model:", recall)
+    # Plot confusion matrix
+    fig1 = plt.figure(1)
+    confusion_matrix(ytst, y_pred, fig1)
+    fig1.suptitle("SVM-Linear Confusion Matrix - C {0}".format(0.1))
+
+    # Plot ROC curve
+    y_pred_proba = svmSk.decision_function(X_test_scaled)
+    fpr, tpr, _ = roc_curve(ytst, y_pred_proba)
+    roc_auc = roc_auc_score(ytst, y_pred_proba)
+    plt.plot(fpr, tpr, color='darkorange', label='ROC Curve (area = %0.2f)' % roc_auc)
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve for SVM Linear')
+    plt.legend(loc="lower right")
+    plt.show()

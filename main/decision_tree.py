@@ -6,6 +6,7 @@ import graphviz
 from data_utils import *
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
+from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import confusion_matrix
 import graphviz
 
@@ -20,8 +21,6 @@ def partition(x):
       ...
       vk: indices of x == vk }, where [v1, ... vk] are all the unique values in the vector z.
     """
-
-    # INSERT YOUR CODE HERE
     try:
         unique_values, indices_by_value = np.unique(x), {}
         for value in unique_values:
@@ -51,7 +50,6 @@ def entropy(y):
         print("An exception occurred:", e)
 
 
-
 def mutual_information(x, y):
     """
     Compute the mutual information between a data column (x) and the labels (y). The data column is a single attribute
@@ -76,8 +74,6 @@ def mutual_information(x, y):
         print("An exception occurred:", e)
 
 
-
-
 def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
     """
     Returns a decision tree represented as a nested dictionary, for example
@@ -99,7 +95,6 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
                 for attr_value in np.unique(all_values):
                     attribute_value_pairs.append((attr_idx, attr_value))
 
-        # print("attr pairs", attribute_value_pairs)
         attribute_value_pairs = np.array(attribute_value_pairs)
 
         unique_vals_y = np.unique(y)
@@ -132,16 +127,10 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
             y_after_part = y.take(np.array(ele_indices), axis=0)
             decision_tree[(chosen_attr, chosen_val, out_label)] = id3(x_after_part, y_after_part,
                                                                       attribute_value_pairs=attribute_value_pairs, depth=depth+1, max_depth=max_depth)
-        
-        
-        # print("DT   >>>>   ",decision_tree)
 
         return decision_tree
     except Exception as e:
-        print("erorrr hereee ")
-        print(e)
-        # raise Exception('Function not yet implemented!')
-
+        raise Exception('Function not yet implemented!')
 
 
 def predict_example(x, tree):
@@ -169,15 +158,12 @@ def predict_example(x, tree):
         print("An exception occurred:", e)
 
 
-
 def compute_error(y_true, y_pred):
     """
     Computes the average error between the true labels (y_true) and the predicted labels (y_pred)
 
     Returns the error = (1/n) * sum(y_true != y_pred)
     """
-
-    # INSERT YOUR CODE HERE
     try:
         n = len(y_true)
         return np.sum(np.abs(y_true-y_pred))/n
@@ -236,12 +222,38 @@ def confusion_matrix(y, y_pred, fig):
     ax.axis("off")
 
 
+def predict_example_proba(x, tree):
+    """
+    Predicts the probability of each class label for a single example x using tree by recursively descending the tree
+    until a label/leaf node is reached.
+
+    Returns a dictionary of the form {class_label: probability} for the predicted probabilities of x according to tree
+    """
+    try:
+        for node, child in tree.items():
+            feature_idx = node[0]
+            feature_val = node[1]
+            decision = node[2]
+
+            if decision == (x[feature_idx] == feature_val):
+                if type(child) is not dict:
+                    # If we've reached a leaf node, return the probability distribution for the class labels
+                    return {0: 1 - child, 1: child}
+                else:
+                    # Recursively descend the tree
+                    return predict_example_proba(x, child)
+    except Exception as e:
+        print("An exception occurred:", e)
+
+
 if __name__ == '__main__':
     # PART-1 training the model using four batches 
     # BATCH 1:1
     # Load batch-1:1, batch-1:2, batch-1:3, batch-1:4 
     Xtrn, ytrn = get_batch_1_1() # change the batch values fucntion from 1-1 to 1-2... etc
-
+    # Xtrn, ytrn = get_batch_1_2()
+    # Xtrn, ytrn = get_batch_1_3()
+    # Xtrn, ytrn = get_batch_1_4() # please uncomment the line when you choose which batch you want to run
     Xtst, ytst = get_test_data()
 
     """
@@ -264,8 +276,11 @@ if __name__ == '__main__':
         test_errors.append(test_error)
         final_ypred = YPred_tst
         print("For depth=", depth)
-        print('Test Error for batch 1:1 = {0:4.2f}%.'.format(test_error*100))
-        print("Accuracy score for batch 1:1: ",accuracy_score(ytst, YPred_tst))
+        print('Test Error= {0:4.2f}%.'.format(test_error*100))
+        print("Accuracy score",accuracy_score(ytst, YPred_tst))
+        print("Precision score from scikit", precision_score(ytst,YPred_tst))
+        print("Recall score from scikit", recall_score(ytst,YPred_tst))
+        print("F1 score from scikit", f1_score(ytst,YPred_tst))
         print()
 
 
@@ -281,6 +296,23 @@ if __name__ == '__main__':
     plt.plot(depths, train_errors, 'o-', color='r', label='Training Examples')
     plt.plot(depths, test_errors, 'o-', color='b', label='Testing Examples')
     plt.legend(loc="best")
+    # plt.show()
+
+    y_scores = []
+    for x in Xtst:
+        y_scores.append(predict_example_proba(x, decision_trees[7])[1])
+    fpr, tpr, thresholds = roc_curve(ytst, y_scores)
+    roc_auc = auc(fpr, tpr)
+
+    # plot ROC Curve
+    plt.figure(3)
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend(loc="lower right")
     plt.show()
 
 
@@ -304,7 +336,7 @@ if __name__ == '__main__':
     fig3 = plt.figure(5)
     confusion_matrix(ytst, predictedYScikit, fig3)
     fig3.suptitle(
-        "Confusion Matrix for Batch 1:4 Test Set with Scikit Decision tree")
+        "Confusion Matrix for Batch 1 Test Set with Scikit Decision tree")
     plt.show()
     splt_idx = 130
 

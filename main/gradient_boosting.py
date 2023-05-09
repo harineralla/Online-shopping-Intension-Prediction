@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import learning_curve
-
+from sklearn.metrics import roc_curve
 
 
 def confusion_matrix(y, y_pred, fig):
@@ -30,6 +30,7 @@ def confusion_matrix(y, y_pred, fig):
              rowLabels=rows,
              colLabels=cols, loc="upper center")
     ax.axis("off")
+
 
 def process_gradient_boosting(Xtrn, ytrn, Xtst, ytst, batch_count):
     clf = GradientBoostingClassifier(n_estimators=800,
@@ -60,52 +61,48 @@ def process_gradient_boosting(Xtrn, ytrn, Xtst, ytst, batch_count):
     plt.fill_between(train_sizes, test_mean + test_std, test_mean - test_std, alpha=0.15, color='green')
     plt.xlabel('Training Set Size')
     plt.ylabel('Accuracy')
-    plt.title('Random Forest Learning Curve for Batch 3')
+    plt.title('Gradient Boosting Learning Curve for Batch 3')
     plt.legend(loc='lower right')
-    plt.show()
+    # plt.show()
 
+    # plot the ROC curve
+    fpr, tpr, thresholds = roc_curve(ytst, clf.predict_proba(Xtst)[:,1])
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve for Gradient Boosting Batch {0}'.format(batch_count))
+    plt.legend(loc="lower right")
+    # plt.show()
 
     fig1 = plt.figure(1)
     confusion_matrix(ytst, predictions, fig1)
     fig1.suptitle("Confusion Matrix using Gradient Boosting Batch {0}".format(batch_count))
-    # plt.show()
+    plt.show()
+
 
 if __name__ == '__main__':
 
-    Xtrn1, ytrn1 = get_batch_1_4()
+    Xtrn1, ytrn1 = get_batch_1_1() # please uncomment the function that the batch you want to run
+    # Xtrn2, ytrn2 = get_batch_1_2()
+    # Xtrn3, ytrn3 = get_batch_1_3()
+    # Xtrn4, ytrn4 = get_batch_1_4()
     Xtst, ytst = get_test_data()
 
     # Initialize SelectKBest with the desired number of features to select
     k = 15  # Number of features to select
     selector = SelectKBest(score_func=f_classif, k=k)
-
-    # Fit the selector on the training data
     selector.fit(Xtrn1, ytrn1)
-
-    # Get the indices of the selected features
     selected_feature_indices = selector.get_support(indices=True)
-
-    # Subset the training data with the selected features
     Xtrn1 = Xtrn1[:, selected_feature_indices]
-    w=Xtrn1.shape[1]
-    print("shape after", w)
-
-
-    # Similarly, subset the test data (if applicable)
+    # w=Xtrn1.shape[1]
+    # print("shape after", w)
     Xtst = Xtst[:, selected_feature_indices]
 
-
-    # Feature scaling for SVM and Gradient Boosting
+    # Feature scaling Gradient Boosting
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(Xtrn1)
     X_test_scaled = scaler.transform(Xtst)
-
-
-    # Xtrn2, ytrn2 = get_batch_1_2()
-    # Xtrn3, ytrn3 = get_batch_1_3()
-    # Xtrn4, ytrn4 = get_batch_1_4()
-    # Xtst, ytst = get_test_data()
-    process_gradient_boosting(X_train_scaled,ytrn1, X_test_scaled,ytst,4)
-    # process_gradient_boosting(Xtrn2,ytrn2, Xtst,ytst,2)
+    process_gradient_boosting(X_train_scaled,ytrn1, X_test_scaled,ytst,1)
+    # process_gradient_boosting(Xtrn2,ytrn2, Xtst,ytst,2) # please uncomment the function that the batch you want to run
     # process_gradient_boosting(Xtrn3,ytrn3, Xtst,ytst,3)
     # process_gradient_boosting(Xtrn4,ytrn4, Xtst,ytst,4)

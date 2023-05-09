@@ -7,6 +7,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import learning_curve
+from sklearn.metrics import roc_curve, auc
 
 
 def confusion_matrix(y, y_pred, fig):
@@ -29,6 +30,7 @@ def confusion_matrix(y, y_pred, fig):
              rowLabels=rows,
              colLabels=cols, loc="upper center")
     ax.axis("off")
+
 
 def process_logistic_regression(Xtrn, ytrn, Xtst, ytst, batch_count):
     clf = LogisticRegression(random_state=42, solver='lbfgs', max_iter=1000).fit(Xtrn, ytrn)
@@ -60,14 +62,28 @@ def process_logistic_regression(Xtrn, ytrn, Xtst, ytst, batch_count):
     plt.legend(loc='lower right')
     plt.show()
 
+    # plot the ROC curve
+    probs = clf.predict_proba(Xtst)
+    fpr, tpr, thresholds = roc_curve(ytst, probs[:, 1])
+    roc_auc = auc(fpr, tpr)
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve for Logistic Regression Batch {0}'.format(batch_count))
+    plt.legend(loc="lower right")
+    # plt.show()
+
     fig1 = plt.figure(2)
     confusion_matrix(ytst, predictions, fig1)
-    fig1.suptitle("Logistic Regression Confusion Matrix - Batch 3")
-    # plt.show()
+    fig1.suptitle('Logistic Regression Confusion Matrix - Batch {0}'.format(batch_count))
+    plt.show()
 
 
 if __name__ == '__main__':
-    Xtrn1, ytrn1 = get_batch_1_3()
+
+    Xtrn1, ytrn1 = get_batch_1_1() # please uncomment the function that the batch you want to run
     # Xtrn2, ytrn2 = get_batch_1_2()
     # Xtrn3, ytrn3 = get_batch_1_3()
     # Xtrn4, ytrn4 = get_batch_1_4()
@@ -76,28 +92,18 @@ if __name__ == '__main__':
     # Initialize SelectKBest with the desired number of features to select
     k = 15  # Number of features to select
     selector = SelectKBest(score_func=f_classif, k=k)
-
-    # Fit the selector on the training data
     selector.fit(Xtrn1, ytrn1)
-
-    # Get the indices of the selected features
     selected_feature_indices = selector.get_support(indices=True)
-
-    # Subset the training data with the selected features
     Xtrn1 = Xtrn1[:, selected_feature_indices]
-    w=Xtrn1.shape[1]
-    print("shape after", w)
-
-
-    # Similarly, subset the test data (if applicable)
+    # w=Xtrn1.shape[1]
+    # print("shape after", w)
     Xtst = Xtst[:, selected_feature_indices]
 
-
-    # Feature scaling for SVM and Gradient Boosting
+    # Feature scaling Gradient Boosting
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(Xtrn1)
     X_test_scaled = scaler.transform(Xtst)
-    process_logistic_regression(Xtrn1,ytrn1, Xtst,ytst,3)
-    # process_logistic_regression(Xtrn2,ytrn2, Xtst,ytst,2)
+    process_logistic_regression(X_train_scaled,ytrn1, X_test_scaled,ytst,1)
+    # process_logistic_regression(Xtrn2,ytrn2, Xtst,ytst,2) # please uncomment the function that the batch you want to run
     # process_logistic_regression(Xtrn3,ytrn3, Xtst,ytst,3)
     # process_logistic_regression(Xtrn4,ytrn4, Xtst,ytst,4)
