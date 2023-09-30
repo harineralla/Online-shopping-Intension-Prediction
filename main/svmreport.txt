@@ -1,0 +1,313 @@
+https://www.kaggle.com/code/prathameshbhalekar/svm-with-kernel-trick-from-scratch/notebook
+
+In general, the Gaussian kernel is a mathematical function used in machine learning and pattern recognition to measure the similarity or distance between two data points in a high-dimensional space. It is commonly used in non-linear algorithms, such as Support Vector Machines (SVMs), to capture complex relationships and identify non-linear decision boundaries.
+
+The Gaussian kernel is defined as:
+
+K(x, y) = exp(-||x - y||^2 / (2 * σ^2))
+
+Here, x and y are data points or vectors in the input space, ||x - y||^2 represents the squared Euclidean distance between the vectors, and σ^2 is a parameter that controls the width or spread of the kernel.
+
+The Gaussian kernel assigns a higher similarity value (close to 1) to data points that are close to each other in the input space and a lower similarity value (close to 0) to points that are farther apart. It characterizes the similarity or dissimilarity between data points based on their relative distances.
+
+In the context of SVMs, the Gaussian kernel is often used to transform the input space into a higher-dimensional feature space, where linear separation of data becomes possible. It allows SVMs to effectively handle non-linear patterns by mapping the data into a space where linear decision boundaries can be constructed.
+
+By calculating the similarity or distance between data points using the Gaussian kernel, SVMs can learn complex decision rules and capture intricate patterns in the data, leading to more accurate and flexible classification or regression models.
+
+
+
+feature selection:
+cols after feaure selection: 20
+Training the model...
+ Epoch 1 --> Loss = 20.000006067376873 
+ Epoch 2 --> Loss = 19.99881055204462 
+ Epoch 3 --> Loss = 19.99763870733341 
+ Epoch 4 --> Loss = 19.99649006339924 
+ Epoch 5 --> Loss = 19.99536415973597 
+ Epoch 6 --> Loss = 19.994260544989633 
+ Epoch 7 --> Loss = 19.993178776776443 
+ Epoch 8 --> Loss = 19.9921184215044 
+ Epoch 9 --> Loss = 19.991079054198437 
+ Epoch 10 --> Loss = 19.99006025832907 
+_________lr=0.01, C=20, epochs=10, width=0.01_____________
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+Training Accuracy of our model= 0.9675
+Testing Accuracy of our model= 0.9545823195458232
+Precision of our model: 0.1627017841971113
+Recall of our model: 0.9318734793187348
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/svm/_base.py:1244: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Test Accuracy of SCKIT model for SVM:  0.8856447688564477
+Precision of scikit model: 0.6796657381615598
+Recall of scikit model: 0.593673965936739
+
+
+
+cols after feaure selection: 5
+Training the model...
+ Epoch 1 --> Loss = 20.000116593586096 
+ Epoch 2 --> Loss = 19.97714300504075 
+ Epoch 3 --> Loss = 19.954624282354448 
+ Epoch 4 --> Loss = 19.932551396782134 
+ Epoch 5 --> Loss = 19.910915499019904 
+ Epoch 6 --> Loss = 19.889707915636478 
+ Epoch 7 --> Loss = 19.868920145575565 
+ Epoch 8 --> Loss = 19.848543856727936 
+ Epoch 9 --> Loss = 19.828570882571544 
+ Epoch 10 --> Loss = 19.8089932188786 
+_________lr=0.01, C=20, epochs=10, width=0.01_____________
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+Training Accuracy of our model= 1.0
+Testing Accuracy of our model= 0.9991889699918897
+Precision of our model: 0.1663961038961039
+Recall of our model: 0.9975669099756691
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/svm/_base.py:1244: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Test Accuracy of SCKIT model for SVM:  0.8860502838605029
+Precision of scikit model: 0.6867816091954023
+Recall of scikit model: 0.581508
+
+
+cols after feaure selection: 12
+Training the model...
+ Epoch 1 --> Loss = 20.000012341746828 
+ Epoch 2 --> Loss = 19.99758052518625 
+ Epoch 3 --> Loss = 19.995196857408637 
+ Epoch 4 --> Loss = 19.992860382696882 
+ Epoch 5 --> Loss = 19.9905701643282 
+ Epoch 6 --> Loss = 19.98832528419639 
+ Epoch 7 --> Loss = 19.986124842441644 
+ Epoch 8 --> Loss = 19.98396795708762 
+ Epoch 9 --> Loss = 19.981853763685855 
+ Epoch 10 --> Loss = 19.97978141496715 
+_________lr=0.01, C=20, epochs=10, width=0.01_____________
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+Training Accuracy of our model= 0.98
+Testing Accuracy of our model= 0.9712084347120844
+Precision of our model: 0.1661795407098121
+Recall of our model: 0.9683698296836983
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/svm/_base.py:1244: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Test Accuracy of SCKIT model for SVM:  0.8844282238442822
+Precision of scikit model: 0.6789772727272727
+Recall of scikit model: 0.5815085158150851
+
+
+
+---for 1_1 test data-----
+cols after feaure selection: 12
+Training the model...
+ Epoch 1 --> Loss = 20.000011514547353 
+ Epoch 2 --> Loss = 19.997742689288554 
+ Epoch 3 --> Loss = 19.99551878566437 
+ Epoch 4 --> Loss = 19.993338912014142 
+ Epoch 5 --> Loss = 19.991202194398486 
+ Epoch 6 --> Loss = 19.98910777624681 
+ Epoch 7 --> Loss = 19.987054818011963 
+ Epoch 8 --> Loss = 19.98504249683163 
+ Epoch 9 --> Loss = 19.98307000619657 
+ Epoch 10 --> Loss = 19.981136555625405 
+_________lr=0.01, C=20, epochs=10, width=0.01_____________
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+prediction vals [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+Training Accuracy of our model= 0.9956304619225967
+Testing Accuracy of our model= 0.9898648648648649
+Precision of our model: 0.49829351535836175
+Recall of our model: 0.9898305084745763
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/svm/_base.py:1244: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Test Accuracy of SCKIT model for SVM:  0.731418918918919
+Precision of scikit model: 0.925
+Recall of scikit model: 0.5016949152542373
+
+
+
+
+
+width: i get 99.7% test accuracy for 0.1 width and 94.5% accuracy for 0.01 width and 17% for 0.001(overfit)
+The difference in test accuracy between a width of 0.1 and 0.01 suggests that the choice of the width parameter has a significant impact on the performance of the model.
+
+A width of 0.1 seems to work better for your specific dataset, as it achieves a higher test accuracy of 99.7%. This indicates that a larger width value allows the Gaussian kernel to capture more global patterns and generalize well to unseen data. However, it's worth noting that achieving such high accuracy might also indicate potential overfitting if the model performs significantly worse on the validation or unseen data.
+
+On the other hand, a width of 0.01 results in a lower test accuracy of 94.5%. This could imply that the smaller width value leads to a more localized and detailed similarity function. While it may capture fine-grained patterns within the training data, it might struggle to generalize to unseen examples.
+
+It's important to strike a balance between capturing local details and generalizing well to unseen data. It's recommended to perform further analysis, such as cross-validation or validation set evaluation, to ensure that the model's performance is consistent across different datasets and to choose the width parameter that provides the best overall performance.
+
+
+The C parameter in a support vector machine (SVM) affects the trade-off between maximizing the margin and minimizing the training error. It controls the penalty for misclassified data points and the amount of regularization applied to the model.
+
+A larger value of C (e.g., C = 100) indicates a higher penalty for misclassification and a lower tolerance for errors on the training set. In other words, the model will strive to correctly classify as many training examples as possible, potentially resulting in a smaller margin and a more complex decision boundary. This can lead to overfitting if the data is noisy or contains outliers.
+
+On the other hand, a smaller value of C (e.g., C = 0.1) allows for more misclassifications and a larger margin. The model will focus on finding a wider margin even if it means misclassifying a few training examples. This can lead to better generalization performance if the data has some amount of noise or outliers.
+
+In practice, the choice of C should be based on the specific dataset and problem at hand. It often requires tuning and experimentation to find the optimal value that balances the trade-off between margin size and training error. Cross-validation or grid search techniques can be employed to find the best C value for a given problem.
+
+
+vernoi:
+If you want to construct a decision boundary based on class labels that strictly separates different classes without any perpendicular separation within the same class, you can consider using other classification algorithms or techniques that provide such behavior.
+
+One option is to use a different classification algorithm such as k-nearest neighbors (KNN) or random forests. These algorithms can produce decision boundaries that better conform to the class distribution and may exhibit the desired behavior of strictly separating different classes without perpendicular separation within the same class.
+
+Another approach is to use ensemble techniques such as gradient boosting or AdaBoost, which combine multiple weak classifiers to create a strong classifier. These techniques can also help in constructing decision boundaries that align with the class distribution and minimize any unwanted separation within the same class.
+
+It's worth noting that the choice of the algorithm and its parameters can significantly affect the decision boundary's behavior. It's recommended to experiment with different algorithms and tune their parameters to achieve the desired decision boundary characteristics.
+
+
+precision and recall:
+The overall opinion on the above model would depend on the specific requirements and priorities of the problem at hand.
+
+Considering the high accuracy on both the training and testing datasets, the model appears to have good generalization capabilities and performs well in terms of overall classification accuracy. This suggests that it has learned the underlying patterns and can make accurate predictions on unseen data.
+
+However, the low precision score indicates that the model has a high number of false positives, meaning it tends to classify some negative instances as positive. This can be a concern, especially in scenarios where false positives have significant consequences or costs.
+
+On the other hand, the high recall score suggests that the model is effective at identifying positive instances, meaning it has a relatively low number of false negatives. This is important when the goal is to capture as many positive cases as possible, even at the cost of some false positives.
+
+Therefore, the overall opinion on the model would depend on the specific context and requirements. If the focus is on overall accuracy and recall, the model may be considered successful. However, if precision is a crucial factor, then further improvements or adjustments might be necessary to reduce the false positive rate.
+
+
+_________lr=0.01, C=20, epochs=10, width=0.01_____________
+in eval y_pred [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1]
+in eval y_pred [1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1]
+Training Accuracy of our model= 0.9794007490636704
+Testing Accuracy of our model= 0.9586374695863747
+Precision of our model: 0.38846587704455726
+Recall of our model: 0.6504460665044607
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/svm/_base.py:1244: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Test Accuracy of SCKIT model for SVM:  0.8742903487429035
+Precision of scikit model: 0.7929549182212547
+Recall of scikit model: 0.7036496350364964
+
+
+
+
+
+
+
+stratified
+
+raining Accuracy of our model= 0.9950062421972534
+Testing Accuracy of our model= 0.9898648648648649
+Precision of our model: 0.49943117178612056
+Recall of our model: 0.6632768361581921
+Data preprocessing in progress..
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/feature_selection/_univariate_selection.py:112: UserWarning: Features [6 7] are constant.
+  warnings.warn("Features %s are constant." % constant_features_idx, UserWarning)
+/Users/suchithnj/Dropbox/Sem 4/ML-Project/env/lib/python3.11/site-packages/sklearn/feature_selection/_univariate_selection.py:113: RuntimeWarning: invalid value encountered in divide
+  f = msb / msw
+cols after feaure selection: 12
+ Epoch 1 --> Loss = 0.10000000245607468 
+ Epoch 2 --> Loss = 0.09999951851136886 
+ Epoch 3 --> Loss = 0.0999990441485324 
+ Epoch 4 --> Loss = 0.09999857917737244 
+ Epoch 5 --> Loss = 0.099998123411476 
+ Epoch 6 --> Loss = 0.099997676668135 
+ Epoch 7 --> Loss = 0.0999972387682724 
+ Epoch 8 --> Loss = 0.0999968095363702 
+ Epoch 9 --> Loss = 0.09999638880039842 
+ Epoch 10 --> Loss = 0.09999597639174586 
+ Epoch 1 --> Loss = 0.10000000213861168 
+ Epoch 2 --> Loss = 0.09999958074678297 
+ Epoch 3 --> Loss = 0.09999916769830713 
+ Epoch 4 --> Loss = 0.09999876282757493 
+ Epoch 5 --> Loss = 0.09999836597226844 
+ Epoch 6 --> Loss = 0.09999797697329568 
+ Epoch 7 --> Loss = 0.09999759567472653 
+ Epoch 8 --> Loss = 0.0999972219237297 
+ Epoch 9 --> Loss = 0.09999685557051118 
+ Epoch 10 --> Loss = 0.09999649646825386 
+ Epoch 1 --> Loss = 0.10000000290853682 
+ Epoch 2 --> Loss = 0.09999942981073555 
+ Epoch 3 --> Loss = 0.0999988680599915 
+ Epoch 4 --> Loss = 0.09999831743107411 
+ Epoch 5 --> Loss = 0.09999777770322918 
+ Epoch 6 --> Loss = 0.09999724866008977 
+ Epoch 7 --> Loss = 0.09999673008958905 
+ Epoch 8 --> Loss = 0.09999622178387471 
+ Epoch 9 --> Loss = 0.09999572353922516 
+ Epoch 10 --> Loss = 0.09999523515596737 
+ Epoch 1 --> Loss = 0.10000000281572968 
+ Epoch 2 --> Loss = 0.0999994480046373 
+ Epoch 3 --> Loss = 0.09999890417853424 
+ Epoch 4 --> Loss = 0.09999837111937668 
+ Epoch 5 --> Loss = 0.09999784861345437 
+ Epoch 6 --> Loss = 0.09999733645130433 
+ Epoch 7 --> Loss = 0.09999683442762645 
+ Epoch 8 --> Loss = 0.09999634234120071 
+ Epoch 9 --> Loss = 0.09999585999480595 
+ Epoch 10 --> Loss = 0.09999538719514046 
+Fold 1 Accuracy: 0.4864864864864865
+Fold 1 Precision: 0.24657534246575344
+Fold 1 Recall: 0.4864864864864865
+Fold 2 Accuracy: 0.49324324324324326
+Fold 2 Precision: 0.2517241379310345
+Fold 2 Recall: 0.49324324324324326
+Fold 3 Accuracy: 0.49324324324324326
+Fold 3 Precision: 0.24829931972789115
+Fold 3 Recall: 0.49324324324324326
+Fold 4 Accuracy: 0.4864864864864865
+Fold 4 Precision: 0.24158852730281302
+Fold 4 Recall: 0.4864864864864865
+Average Accuracy: 0.4898648648648649
+Average Precision: 0.247046831856873
+Average Recall: 0.4898648648648649
+(env) suchithnj@SUCHITHs-Air ML-Project % 
+
+
+
+
+
+
+
+kfold 
+
+Fold 1 Accuracy: 0.9882352941176471
+Fold 1 Precision: 1.0
+Fold 1 Recall: 0.9882352941176471
+Fold 2 Accuracy: 0.9764705882352941
+Fold 2 Precision: 1.0
+Fold 2 Recall: 0.9764705882352941
+Fold 3 Accuracy: 0.9882352941176471
+Fold 3 Precision: 1.0
+Fold 3 Recall: 0.9882352941176471
+Fold 4 Accuracy: 0.4588235294117647
+Fold 4 Precision: 0.221119773210489
+Fold 4 Recall: 0.4588235294117647
+Fold 5 Accuracy: 0.0
+Fold 5 Precision: 0.0
+Fold 5 Recall: 0.0
+Fold 6 Accuracy: 0.0
+Fold 6 Precision: 0.0
+Fold 6 Recall: 0.0
+Fold 7 Accuracy: 0.0
+Fold 7 Precision: 0.0
+Fold 7 Recall: 0.0
+Average Accuracy: 0.4873949579831933
+Average Precision: 0.4601599676014984
+Average Recall: 0.4873949579831933
+
+
+
+
+
+
+Fold 1 Accuracy: 0.6431095406360424
+Fold 1 Precision: 0.4236234682948632
+Fold 1 Recall: 0.6431095406360424
+Fold 2 Accuracy: 0.16607773851590105
+Fold 2 Precision: 0.02827275786639744
+Fold 2 Recall: 0.16607773851590105
+Fold 3 Accuracy: 0.4693396226415094
+Fold 3 Precision: 0.22432084467132932
+Fold 3 Recall: 0.4693396226415094
+Fold 4 Accuracy: 0.0
+Fold 4 Precision: 0.0
+Fold 4 Recall: 0.0
+Average Accuracy: 0.3196317254483632
+Average Precision: 0.1690542677081475
+Average Recall: 0.3196317254483632
