@@ -1,4 +1,4 @@
-# Predictive Model for E-commerce Purchase Intent
+# Online Shopping Intension Prediction
 
 ## Overview
 This project focuses on developing a predictive model to determine a user's purchase intention when visiting an e-commerce website. Various machine learning algorithms and techniques are employed to analyze session data and predict whether a user will make a transaction.
